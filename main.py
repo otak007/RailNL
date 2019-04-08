@@ -77,6 +77,12 @@ for station in stations:
                    if station1.name == connection.stationA:
                        plt.plot([float(station.yCoordinate), float(station1.yCoordinate)], [float(station.xCoordinate), float(station1.xCoordinate)], 'r-')
 
+            else:
+                for station3 in stations:
+                    for station4 in stations:
+                       if (station3.name == connection.stationA or station3.name == connection.stationB) and (station4.name == connection.stationA or station4.name == connection.stationB) and connection.chooseConnection == False:
+                           plt.plot([float(station3.yCoordinate), float(station4.yCoordinate)], [float(station3.xCoordinate), float(station4.xCoordinate)], 'k-')        
+                    
 print(nocc)
 print(nrOfConnections)
 plt.show()        
