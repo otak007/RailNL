@@ -15,4 +15,5 @@ class Connection(object):
         self.travelTime = int(travelTime)
         self.chooseConnection = chooseConnection
         self.travelled = False
-        self.other_traject = False
+        self.critical = False
+        self.value = 0
