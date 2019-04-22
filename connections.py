@@ -15,5 +15,10 @@ class Connection(object):
         self.travelTime = int(travelTime)
         self.chooseConnection = chooseConnection
         self.travelled = False
-        self.critical = False
-        self.value = 0
+        self.critical = 0
+
+
+    def calc_val(self):
+        ## Calculates value according to given formula
+        score = self.critical * 500 - self.travelTime / 10
+        return score

@@ -14,4 +14,4 @@ class Traject(object):
         self.start_station = start_station
         self.total_time = 0
         self.traject = []
-        self.score = 0
+        self.scores = []
