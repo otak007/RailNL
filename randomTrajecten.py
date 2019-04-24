@@ -33,25 +33,10 @@ class Map(object):
         
             for row in csv_reader:
                 stations.append(Station(row[0], row[1], row[2], row[3]))
-                plt.plot(float(row[2]), float(row[1]), "bo")
-                plt.text(float(row[2]) -0.02, float(row[1])+0.02, row[0], fontsize=5)
-            return stations
-    
-    def plot(self):
-        
-        for station in self.stations:
-            
-            for connection in self.connections:
                 
-                if (station.name == connection.stationA or station.name == connection.stationB) and connection.chooseConnection == False:
-                   connection.chooseConnection = True
-    
-                   for station2 in self.stations:
-                       if station2.name == connection.stationB or station2.name == connection.stationA:
-                           if station.critical or station2.critical:
-                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y-')
-                           else:
-                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y--')
+            return stations
+      
+                
 
     def is_critical(self):
 
@@ -62,32 +47,87 @@ class Map(object):
                     connection.critical = 1
 
 
+    # Choose random 4 trajects 1000000 times and return the 4 trajects with highest K 
     def choose_trajecten(self):
 
+        
+        num_trajects = 4
         trajecten = self.random_traject()
-        option1, option2, option3 = random.sample(range(0, len(trajecten)), 3)
 
-        for i in range(10000):
-            critical_connections = sum(trajecten[option1].scores) + sum(trajecten[option2].scores) + sum(trajecten[option3].scores)
-            total_time = trajecten[option1].total_time + trajecten[option2].total_time + trajecten[option3].total_time
-            k = critical_connections/22*10000 - (20*3 + total_time/10)
+        # Create 4 random different integers 
+        options = random.sample(range(0, len(trajecten)), num_trajects)
 
-            option1_, option2_, option3_ = random.sample(range(0, len(trajecten)), 3)
+        x = []
+        found_k = []
 
-            critical_connections_ = sum(trajecten[option1_].scores) + sum(trajecten[option2_].scores) + sum(trajecten[option3_].scores)
-            total_time_ = trajecten[option1_].total_time + trajecten[option2_].total_time + trajecten[option3_].total_time
-            k_ = critical_connections_/22*10000 - (20*3 + total_time_/10)
+        # Choose 4 trajects twice and rember the 4 with the highest K, repeat this 1 000 000 times
+        for i in range(1000000):
+
+            mounted_connections  = []
+            traveltime = 0
+            mounted_connections_critical = 0
+
+            # Create the total traveltime and total number of mounted critical connections for the first 4 trajects   
+            for option in options:
+                traveltime = traveltime + trajecten[option].total_time
+                for connection in trajecten[option].connections:
+
+                    # Add a connection to the list only when it is the first time the connection is mounted.  
+                    if mounted_connections.count(connection) == 0:
+                        mounted_connections.append(connection)
+                        mounted_connections_critical = mounted_connections_critical + connection.critical
             
-            if k_ > k:
-               option1 = option1_
-               option2 = option2_
-               option3 = option3_
-    
-        print(k)
-        print(trajecten[option1].traject)
-        print(trajecten[option2].traject)
-        print(trajecten[option3].traject)
+            k = mounted_connections_critical/20*10000 - (20*num_trajects + traveltime/10)
 
+            # Create the second 4 different random indexes 
+            options_ = random.sample(range(0, len(trajecten)), num_trajects)
+
+            # create the same variables as the first 4 trajects but now for the second 4 trajects
+            mounted_connections_ = []
+            traveltime_ = 0
+            mounted_connections_critical_ = 0
+            for option in options_:
+                traveltime_ = traveltime_ + trajecten[option].total_time
+                for connection in trajecten[option].connections:       
+                    if mounted_connections_.count(connection) == 0:
+                        mounted_connections_.append(connection)
+                        mounted_connections_critical_ = mounted_connections_critical_ + connection.critical
+            k_ = mounted_connections_critical_/20*10000 - (20*num_trajects + traveltime_/10)
+
+            # remember the best traject 
+            if k_ > k:
+               options = options_
+               mounted_connections_critical = mounted_connections_critical_
+               k= k_
+               traveltime = traveltime_
+
+            # save the founded k
+            x.append(i)
+            found_k.append(k)
+             
+        print(trajecten[options[0]].traject)
+        print("traveltime ", trajecten[options[0]].total_time)
+
+        print(trajecten[options[1]].traject)
+        print("traveltime ", trajecten[options[1]].total_time)
+
+        print(trajecten[options[2]].traject)
+        print("traveltime ", trajecten[options[2]].total_time)
+
+        if num_trajects > 3:
+            print(trajecten[options[3]].traject)
+            print("traveltime ", trajecten[options[3]].total_time)
+
+        print("K: ", k)
+        print("Mounted critical connections: ", mounted_connections_critical)
+        print("Total traveltime: ", traveltime)
+
+        # plot all the founded K's
+        plt.scatter(x, found_k)
+
+
+
+        
                     
     # Create a traject with a random begin station
     def random_traject(self):
@@ -117,8 +157,8 @@ class Map(object):
         possible_times = []
         possible_critical = []
         
-        
         self.is_critical()
+            
         
         # Maximum time is 120 mins
         if traject.total_time < 120:
@@ -152,7 +192,8 @@ class Map(object):
             random_index = random.randint(0, len(possible_names) - 1)
             next_station = possible_names[random_index]
             traject.total_time += possible_times[random_index]
-            traject.scores.append(possible_critical[random_index])
+
+                
             for row in self.stations:
                 if next_station == row.name:
                     next_station = row
@@ -160,10 +201,11 @@ class Map(object):
                    
             # Reset current station
             traject.traject.append(station.name)
-                    
+            traject.connections.append(possible_connections[random_index])
+        
             current_station = next_station
                
-
+        
             # Travel again with 
             self.travel(traject, current_station, color)                
 
@@ -176,8 +218,8 @@ if __name__ == "__main__":
     start = time.time()  
     NH.choose_trajecten()
     end = time.time()
-    print(end-start)
-
+    print("CPT: ", end-start)
+    plt.show()
 
 
     
