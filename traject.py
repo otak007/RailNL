@@ -15,3 +15,7 @@ class Traject(object):
         self.total_time = 0
         self.traject = []
         self.scores = []
+        self.connections = []
+
+    def __str__(self):
+        return traject.traject

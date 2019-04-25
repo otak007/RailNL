@@ -22,3 +22,6 @@ class Connection(object):
         ## Calculates value according to given formula
         score = self.critical * 500 - self.travelTime / 10
         return score
+
+    def __str__(self):
+        return str(self.stationA + " - " + self.stationB + ": " + str(self.travelTime))
