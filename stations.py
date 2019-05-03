@@ -13,6 +13,8 @@ class Station(object):
         self.name = name
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
+        self.connectedStations = []
+
         if critical == "Kritiek":
             self.critical = True
         else:
