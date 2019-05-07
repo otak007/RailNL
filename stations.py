@@ -9,7 +9,7 @@ Created on Mon Apr  8 21:23:48 2019
 
 # Initial staions objects
 class Station(object):
-    def __init__(self, name, xCoordinate, yCoordinate, critical):
+    def __init__(self, name, xCoordinate, yCoordinate, critical = False):
         self.name = name
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
