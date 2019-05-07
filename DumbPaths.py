@@ -76,7 +76,7 @@ class Map(object):
         self.travel(traject, start_station)
 
 
-#sdfasf
+
     def travel(self, traject, station):
         # Initialize lists
         possible_connections = []
