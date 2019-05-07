@@ -5,6 +5,7 @@ from traject import Traject
 import random
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 import time
  
 class Map(object):
@@ -51,13 +52,14 @@ class Map(object):
     def choose_trajecten(self):
 
         
-        num_trajects = 4
+        num_trajects = 3
         trajecten = self.random_traject()
 
         # Create 4 random different integers 
         options = random.sample(range(0, len(trajecten)), num_trajects)
 
         x = []
+        found_kBest = []
         found_k = []
 
         # Choose 4 trajects twice and rember the 4 with the highest K, repeat this 1 000 000 times
@@ -94,6 +96,9 @@ class Map(object):
                         mounted_connections_critical_ = mounted_connections_critical_ + connection.critical
             k_ = mounted_connections_critical_/20*10000 - (20*num_trajects + traveltime_/10)
 
+            found_k.append(k_)
+            
+            
             # remember the best traject 
             if k_ > k:
                options = options_
@@ -103,7 +108,7 @@ class Map(object):
 
             # save the founded k
             x.append(i)
-            found_k.append(k)
+            found_kBest.append(k)
              
         print(trajecten[options[0]].traject)
         print("traveltime ", trajecten[options[0]].total_time)
@@ -123,8 +128,10 @@ class Map(object):
         print("Total traveltime: ", traveltime)
 
         # plot all the founded K's
-        plt.scatter(x, found_k)
+        #plt.scatter(x, found_kBest)
 
+        lBins = np.linspace(2000, 10000, num=100)
+        plt.hist(found_k, lBins)
 
 
         
@@ -132,7 +139,7 @@ class Map(object):
     # Create a traject with a random begin station
     def random_traject(self):
         trajecten = []
-        for x in range(100):
+        for x in range(1000):
             index = random.randint(0, len(self.stations) - 1)
             begin_station = self.stations[index].name
             trajecten.append(self.new_traject(str(x), begin_station, "c"))
