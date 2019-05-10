@@ -12,10 +12,10 @@ class Connection(object):
     def __init__(self, stationA, stationB, travelTime, chooseConnection):
         self.stationA = stationA
         self.stationB = stationB
-        self.travelTime = int(travelTime)
+        self.travelTime = int(float(travelTime))
         self.chooseConnection = chooseConnection
         self.travelled = False
-        self.critical = 1
+        self.critical = 0
 
 
     def calc_val(self):
