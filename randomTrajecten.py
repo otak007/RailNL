@@ -5,6 +5,7 @@ from traject import Traject
 import random
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 import time
 
 class Map(object):
@@ -51,16 +52,20 @@ class Map(object):
     def choose_trajecten(self):
 
 
-        num_trajects = 4
+        num_trajects = 5
+        tot_num_critical = 20
+        max_min = 120
+
         trajecten = self.random_traject()
 
         # Create 4 random different integers
         options = random.sample(range(0, len(trajecten)), num_trajects)
 
         x = []
+        found_kBest = []
         found_k = []
 
-        # Choose 4 trajects twice and rember the 4 with the highest K, repeat this 1 000 000 times
+        # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
         for i in range(1000000):
 
             mounted_connections  = []
@@ -77,7 +82,7 @@ class Map(object):
                         mounted_connections.append(connection)
                         mounted_connections_critical = mounted_connections_critical + connection.critical
 
-            k = mounted_connections_critical/20*10000 - (20*num_trajects + traveltime/10)
+            k = mounted_connections_critical/tot_num_critical*10000 - (20*num_trajects + traveltime/10)
 
             # Create the second 4 different random indexes
             options_ = random.sample(range(0, len(trajecten)), num_trajects)
@@ -92,47 +97,46 @@ class Map(object):
                     if mounted_connections_.count(connection) == 0:
                         mounted_connections_.append(connection)
                         mounted_connections_critical_ = mounted_connections_critical_ + connection.critical
-            k_ = mounted_connections_critical_/20*10000 - (20*num_trajects + traveltime_/10)
+            k_ = mounted_connections_critical_/tot_num_critical*10000 - (20*num_trajects + traveltime_/10)
+
+            found_k.append(k_)
+
 
             # remember the best traject
             if k_ > k:
                options = options_
                mounted_connections_critical = mounted_connections_critical_
-               k= k_
+               k = k_
                traveltime = traveltime_
 
             # save the founded k
             x.append(i)
-            found_k.append(k)
+            found_kBest.append(k)
 
-        print(trajecten[options[0]].traject)
-        print("traveltime ", trajecten[options[0]].total_time)
-
-        print(trajecten[options[1]].traject)
-        print("traveltime ", trajecten[options[1]].total_time)
-
-        print(trajecten[options[2]].traject)
-        print("traveltime ", trajecten[options[2]].total_time)
-
-        if num_trajects > 3:
-            print(trajecten[options[3]].traject)
-            print("traveltime ", trajecten[options[3]].total_time)
+        for i in range(num_trajects):
+            print(trajecten[options[i]].traject)
+            print("traveltime ", trajecten[options[i]].total_time)
 
         print("K: ", k)
         print("Mounted critical connections: ", mounted_connections_critical)
         print("Total traveltime: ", traveltime)
 
         # plot all the founded K's
-        plt.scatter(x, found_k)
+        #plt.scatter(x, found_kBest)
+        with open("random_k_resultaten", "w+") as f:
+            for k in found_k:
+                f.write(str(k)+ "\n")
 
 
+        lBins = np.linspace(2000, 10000, num=100)
+        plt.hist(found_k, lBins)
 
 
 
     # Create a traject with a random begin station
     def random_traject(self):
         trajecten = []
-        for x in range(100):
+        for x in range(10000):
             index = random.randint(0, len(self.stations) - 1)
             begin_station = self.stations[index].name
             trajecten.append(self.new_traject(str(x), begin_station, "c"))
@@ -161,17 +165,17 @@ class Map(object):
 
 
         # Maximum time is 120 mins
-        if traject.total_time < 120:
+        if traject.total_time < max_min:
 
             # Add relevant connections to relevant lists
             for connection in self.connections:
-                if station.name == connection.stationA and connection.travelTime + traject.total_time < 120:
+                if station.name == connection.stationA and connection.travelTime + traject.total_time < max_min:
                     possible_names.append(connection.stationB)
                     possible_times.append(connection.travelTime)
                     possible_connections.append(connection)
                     possible_critical.append(connection.critical)
 
-                elif station.name == connection.stationB and connection.travelTime + traject.total_time < 120:
+                elif station.name == connection.stationB and connection.travelTime + traject.total_time < max_min:
                     possible_names.append(connection.stationA)
                     possible_times.append(connection.travelTime)
                     possible_connections.append(connection)
