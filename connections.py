@@ -9,7 +9,7 @@ Created on Mon Apr  8 21:07:01 2019
 
 # Initial connection objects
 class Connection(object):
-    def __init__(self, stationA, stationB, travelTime, chooseConnection):
+    def __init__(self, stationA, stationB, travelTime, chooseConnection):    #index,
         self.stationA = stationA
         self.stationB = stationB
         self.travelTime = int(float(travelTime))
