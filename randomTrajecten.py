@@ -1,6 +1,7 @@
 from connections import Connection
 from stations import Station
 from traject import Traject
+from simulated_annealing import SimulatedAnnealing
 
 import random
 import csv
@@ -66,7 +67,7 @@ class Map(object):
         found_k = []
 
         # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
-        for i in range(1000000):
+        for i in range(1000):
 
             mounted_connections  = []
             traveltime = 0
@@ -112,6 +113,9 @@ class Map(object):
             # save the founded k
             x.append(i)
             found_kBest.append(k)
+
+        #temp = 1000
+        #trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
 
         for i in range(num_trajects):
             print(trajecten[options[i]].traject)
@@ -162,7 +166,7 @@ class Map(object):
         possible_critical = []
 
         self.is_critical()
-
+        max_min = 120
 
         # Maximum time is 120 mins
         if traject.total_time < max_min:
@@ -224,3 +228,7 @@ if __name__ == "__main__":
     end = time.time()
     print("CPT: ", end-start)
     plt.show()
+
+    input = NH.choose_trajecten().trajecten
+
+    print(isinstance(traject, (tuple, list, dict, set)))
