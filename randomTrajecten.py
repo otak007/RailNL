@@ -67,7 +67,7 @@ class Map(object):
         found_k = []
 
         # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
-        for i in range(1000):
+        for i in range(10):
 
             mounted_connections  = []
             traveltime = 0
@@ -114,16 +114,24 @@ class Map(object):
             x.append(i)
             found_kBest.append(k)
 
-        #temp = 1000
-        #trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
+        print("ok ")
+        print(trajecten[1].traject[0])
+        strt_station = trajecten[1].traject[0]
+        print(trajecten[1].traject)
+        iteraties_SA = 2
+        for i in range(iteraties_SA):
+            temp = (iteraties_SA/(iteraties_SA - i))*100
+            print(trajecten)
+            trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
+            print(trajecten)
 
-        for i in range(num_trajects):
-            print(trajecten[options[i]].traject)
-            print("traveltime ", trajecten[options[i]].total_time)
+        #for i in range(num_trajects):
+            #print(trajecten[options[i]].traject)
+            #print("traveltime ", trajecten[options[i]].total_time)
 
-        print("K: ", k)
-        print("Mounted critical connections: ", mounted_connections_critical)
-        print("Total traveltime: ", traveltime)
+        #print("K: ", k)
+        #print("Mounted critical connections: ", mounted_connections_critical)
+        #print("Total traveltime: ", traveltime)
 
         # plot all the founded K's
         #plt.scatter(x, found_kBest)

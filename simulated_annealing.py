@@ -48,11 +48,19 @@ class SimulatedAnnealing(object):
 
         #Choose a traject to optimize
         x = randint(0, num_trajects - 1)
-        print(x)
-        print(num_trajects)
 
+        print("x is", x)
         # locate the starting station and remove it
-        start = trajecten[x].traject.pop(0)
+        strt_station = trajecten[x].traject[0]
+        print(trajecten)
+        #for t in trajecten:
+        #    try:
+        #        print(t)
+        #    except:
+        #        print(" ####### ")
+        #        t.print_all()
+        #        print(t)
+        #start = trajecten[x].traject.remove(strt_station)
 
         #remove the first connection by removing the starting station from the list
         #del trajecten[x].traject[0]

@@ -18,4 +18,12 @@ class Traject(object):
         self.connections = []
 
     def __str__(self):
-        return traject.traject
+        return ",".join(self.traject)
+
+    def print_all(self):
+        print(self.name)
+        print(self.start_station)
+        print(self.total_time)
+        print(self.traject)
+        print(self.scores)
+        print(self.connections)
