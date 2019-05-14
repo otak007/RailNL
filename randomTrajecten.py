@@ -17,7 +17,7 @@ class Map(object):
 
     def load_connections(self):
         # Read excel file and create a list with connection objects
-        with open('ConnectiesHolland.csv') as csv_file:
+        with open('ConnectiesNationaal.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             connections = []
@@ -27,13 +27,16 @@ class Map(object):
 
     def load_stations(self):
         # Read excel file and create a list with station objects
-        with open('StationsHolland.csv') as csv_file:
+        with open('StationsNationaal.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             stations = []
 
             for row in csv_reader:
-                stations.append(Station(row[0], row[1], row[2], row[3]))
+                if len(row) == 3:
+                    stations.append(Station(row[0], row[1], row[2], " "))
+                else:
+                    stations.append(Station(row[0], row[1], row[2], row[3]))
 
             return stations
 
@@ -51,85 +54,91 @@ class Map(object):
     # Choose random 4 trajects 1000000 times and return the 4 trajects with highest K
     def choose_trajecten(self):
 
-
-        num_trajects = 5
-        tot_num_critical = 20
-        max_min = 120
-
+        max_number_trajects = 20
+        tot_num_critical = 89
         trajecten = self.random_traject()
 
-        # Create 4 random different integers
-        options = random.sample(range(0, len(trajecten)), num_trajects)
-
-        x = []
-        found_kBest = []
-        found_k = []
-
-        # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
-        for i in range(1000000):
-
-            mounted_connections  = []
-            traveltime = 0
-            mounted_connections_critical = 0
-
-            # Create the total traveltime and total number of mounted critical connections for the first 4 trajects
-            for option in options:
-                traveltime = traveltime + trajecten[option].total_time
-                for connection in trajecten[option].connections:
-
-                    # Add a connection to the list only when it is the first time the connection is mounted.
-                    if mounted_connections.count(connection) == 0:
-                        mounted_connections.append(connection)
-                        mounted_connections_critical = mounted_connections_critical + connection.critical
-
-            k = mounted_connections_critical/tot_num_critical*10000 - (20*num_trajects + traveltime/10)
-
-            # Create the second 4 different random indexes
-            options_ = random.sample(range(0, len(trajecten)), num_trajects)
-
-            # create the same variables as the first 4 trajects but now for the second 4 trajects
-            mounted_connections_ = []
-            traveltime_ = 0
-            mounted_connections_critical_ = 0
-            for option in options_:
-                traveltime_ = traveltime_ + trajecten[option].total_time
-                for connection in trajecten[option].connections:
-                    if mounted_connections_.count(connection) == 0:
-                        mounted_connections_.append(connection)
-                        mounted_connections_critical_ = mounted_connections_critical_ + connection.critical
-            k_ = mounted_connections_critical_/tot_num_critical*10000 - (20*num_trajects + traveltime_/10)
-
-            found_k.append(k_)
+        for num_trajects in range(1, max_number_trajects+1):
+            start = time.time()
 
 
-            # remember the best traject
-            if k_ > k:
-               options = options_
-               mounted_connections_critical = mounted_connections_critical_
-               k = k_
-               traveltime = traveltime_
+            # Create 4 random different integers
+            options = random.sample(range(0, len(trajecten)), num_trajects)
 
-            # save the founded k
-            x.append(i)
-            found_kBest.append(k)
+            x = []
+            found_kBest = []
+            found_k = []
 
-        for i in range(num_trajects):
-            print(trajecten[options[i]].traject)
-            print("traveltime ", trajecten[options[i]].total_time)
+            # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
+            for i in range(1000000):
 
-        print("K: ", k)
-        print("Mounted critical connections: ", mounted_connections_critical)
-        print("Total traveltime: ", traveltime)
+                mounted_connections  = []
+                traveltime = 0
+                mounted_connections_critical = 0
 
-        # plot all the founded K's
-        #plt.scatter(x, found_kBest)
-        with open("random_k_resultaten", "w+") as f:
-            for k in found_k:
-                f.write(str(k)+ "\n")
+                # Create the total traveltime and total number of mounted critical connections for the first 4 trajects
+                for option in options:
+                    traveltime = traveltime + trajecten[option].total_time
+                    for connection in trajecten[option].connections:
+
+                        # Add a connection to the list only when it is the first time the connection is mounted.
+                        if mounted_connections.count(connection) == 0:
+                            mounted_connections.append(connection)
+                            mounted_connections_critical = mounted_connections_critical + connection.critical
+
+                k = mounted_connections_critical/tot_num_critical*10000 - (20*num_trajects + traveltime/10)
+
+                # Create the second 4 different random indexes
+                options_ = random.sample(range(0, len(trajecten)), num_trajects)
+
+                # create the same variables as the first 4 trajects but now for the second 4 trajects
+                mounted_connections_ = []
+                traveltime_ = 0
+                mounted_connections_critical_ = 0
+                for option in options_:
+                    traveltime_ = traveltime_ + trajecten[option].total_time
+                    for connection in trajecten[option].connections:
+                        if mounted_connections_.count(connection) == 0:
+                            mounted_connections_.append(connection)
+                            mounted_connections_critical_ = mounted_connections_critical_ + connection.critical
+                k_ = mounted_connections_critical_/tot_num_critical*10000 - (20*num_trajects + traveltime_/10)
+
+                found_k.append(k_)
 
 
-        lBins = np.linspace(2000, 10000, num=100)
-        plt.hist(found_k, lBins)
+                # remember the best traject
+                if k_ > k:
+                   options = options_
+                   mounted_connections_critical = mounted_connections_critical_
+                   k = k_
+                   traveltime = traveltime_
+
+                # save the founded k
+                x.append(i)
+                found_kBest.append(k)
+
+            end = time.time()
+
+            # plot all the founded K's
+            #plt.scatter(x, found_kBest)
+            with open("random_k_resultaten"+str(num_trajects), "w+") as f:
+                for foundK in found_k:
+                    f.write(str(foundK)+ "\n")
+
+                f.write("\nBest traject:\n")
+                for i in range(num_trajects):
+                    f.write(str(trajecten[options[i]].traject)+ "\n")
+                    f.write(str("traveltime "+ str(trajecten[options[i]].total_time) + "\n"))
+
+                f.write("Total traveltime: " +str(traveltime)+"\n")
+                f.write("K: "+ str(k) +"\n")
+                f.write("CPT: "+ str(end-start))
+
+
+
+
+        #lBins = np.linspace(2000, 10000, num=100)
+        #plt.hist(found_k, lBins)
 
 
 
@@ -160,6 +169,8 @@ class Map(object):
         possible_names = []
         possible_times = []
         possible_critical = []
+
+        max_min = 180
 
         self.is_critical()
 
@@ -223,4 +234,4 @@ if __name__ == "__main__":
     NH.choose_trajecten()
     end = time.time()
     print("CPT: ", end-start)
-    plt.show()
+    #plt.show()
