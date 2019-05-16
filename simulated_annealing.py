@@ -67,7 +67,7 @@ class SimulatedAnnealing(object):
 
         # look up the travel time of the first connection
         for connection in connections:
-            if ((start == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
+            if ((strt_station == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
                 min = connection.travelTime
 
         # update the travel time of the traject
