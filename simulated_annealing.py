@@ -8,7 +8,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 import random
-
+import copy
 
 
 
@@ -39,20 +39,18 @@ class SimulatedAnnealing(object):
         return k
 
 
-    def SA(self, trajecten, temp, num_trajects, connections, stations):
+    def SA(self, x, trajecten, temp, num_trajects, connections, stations):
 
         from randomTrajecten import Map
 
-        Solution_current = trajecten
+        Solution_current = copy.deepcopy(trajecten)
         min = 0
 
-        #Choose a traject to optimize
-        x = randint(0, num_trajects - 1)
 
-        print("x is", x)
-        # locate the starting station and remove it
-        strt_station = trajecten[x].traject[0]
-        print(trajecten)
+
+
+
+
         #for t in trajecten:
         #    try:
         #        print(t)
@@ -60,29 +58,33 @@ class SimulatedAnnealing(object):
         #        print(" ####### ")
         #        t.print_all()
         #        print(t)
-        #start = trajecten[x].traject.remove(strt_station)
+        print("het traject:")
+        print(trajecten[x].traject)
+        if (trajecten[x].traject != None):
+            strt_station = trajecten[x].traject[0]
+            #start = trajecten[x].traject.remove(strt_station)
 
-        #remove the first connection by removing the starting station from the list
-        #del trajecten[x].traject[0]
+            #remove the first connection by removing the starting station from the list
+            #del trajecten[x].traject[0]
 
-        # look up the travel time of the first connection
-        for connection in connections:
-            if ((start == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
-                min = connection.travelTime
+            # look up the travel time of the first connection
+            for connection in connections:
+                if ((strt_station == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
+                    min = connection.travelTime
 
-        # update the travel time of the traject
-        trajecten[x].total_time = trajecten[x].total_time - min
+            # update the travel time of the traject
+            trajecten[x].total_time = trajecten[x].total_time - min
 
-        #the index of the last station
-        laatste = len(trajecten[x].traject)-1
+            #the index of the last station
+            laatste = len(trajecten[x].traject)-1
 
-        # append new stations from the last station until 120 min are full
-        for station in stations:
-            if (trajecten[x].traject[laatste] == station.name):
-                station_eind = station
+            # append new stations from the last station until 120 min are full
+            for station in stations:
+                if (trajecten[x].traject[laatste] == station.name):
+                    station_eind = station
 
         color = "c"
-        Solution_new = trajecten
+        Solution_new = copy.deepcopy(trajecten)
         Solution_new[x].traject = Map.travel(self, trajecten[x], station, color)
 
         # calculate how much worse the new solution is
@@ -100,5 +102,6 @@ class SimulatedAnnealing(object):
         elif (probability > random.random() ):
             Solution_current = Solution_new
 
-
+        print("de return value")
+        print(Solution_current.traject)
         return Solution_current

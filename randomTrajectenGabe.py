@@ -1,8 +1,6 @@
 from connections import Connection
 from stations import Station
 from traject import Traject
-from random import randint
-from simulated_annealing import SimulatedAnnealing
 
 import random
 import csv
@@ -72,9 +70,6 @@ class Map(object):
             found_k = []
 
             # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
-            #for i in range(1000000):
-
-            # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
             for i in range(10):
 
                 mounted_connections  = []
@@ -124,26 +119,11 @@ class Map(object):
 
             end = time.time()
 
-            print("ok ")
-            strt_station = trajecten[1].traject[0]
-            iteraties_SA = 3
-            #Choose a traject to optimize
-            x = randint(0, num_trajects - 1)
-
-            trajectSA = trajecten[x].traject
-            if (trajecten[x].traject != None):
-                for i in range(iteraties_SA):
-                    temp = (iteraties_SA/(iteraties_SA - i))*100
-                    #print(trajecten)
-                    trajecten = SimulatedAnnealing.SA(self, x, trajecten, temp, num_trajects, self.connections, self.stations)
-                    #print(trajecten)
-
-        #temp = 1000
-        #trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
-
-            for i in range(num_trajects):
-                #print(trajecten[options[i]].traject)
-                #print("traveltime ", trajecten[options[i]].total_time)
+            # plot all the founded K's
+            #plt.scatter(x, found_kBest)
+            with open("random_k_resultaten"+str(num_trajects), "w+") as f:
+                for foundK in found_k:
+                    f.write(str(foundK)+ "\n")
 
                 f.write("\nBest traject:\n")
                 for i in range(num_trajects):
@@ -193,7 +173,7 @@ class Map(object):
         max_min = 180
 
         self.is_critical()
-        max_min = 120
+
 
         # Maximum time is 120 mins
         if traject.total_time < max_min:
@@ -254,8 +234,4 @@ if __name__ == "__main__":
     NH.choose_trajecten()
     end = time.time()
     print("CPT: ", end-start)
-    plt.show()
-
-    input = NH.choose_trajecten().trajecten
-
-    print(isinstance(traject, (tuple, list, dict, set)))
+    #plt.show()
