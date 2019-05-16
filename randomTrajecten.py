@@ -70,12 +70,18 @@ class Map(object):
             x = []
             found_kBest = []
             found_k = []
+<<<<<<< HEAD
 
             # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
             #for i in range(1000000):
 
             # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
             for i in range(10):
+=======
+
+            # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
+            for i in range(1000000):
+>>>>>>> add34a17fe047f38348640e0a36c2494f8fb511b
 
                 mounted_connections  = []
                 traveltime = 0
@@ -124,6 +130,7 @@ class Map(object):
 
             end = time.time()
 
+<<<<<<< HEAD
             print("ok ")
             strt_station = trajecten[1].traject[0]
             iteraties_SA = 3
@@ -154,6 +161,35 @@ class Map(object):
                 f.write("K: "+ str(k) +"\n")
                 f.write("CPT: "+ str(end-start))
 
+=======
+        #print("ok ")
+        #print(trajecten[1].traject[0])
+        #strt_station = trajecten[1].traject[0]
+        #print(trajecten[1].traject)
+        #iteraties_SA = 2
+        #for i in range(iteraties_SA):
+        #    temp = (iteraties_SA/(iteraties_SA - i))*100
+        #    print(trajecten)
+        #    trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
+        #    print(trajecten)
+
+        #temp = 1000
+        #trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
+
+        for i in range(num_trajects):
+            print(trajecten[options[i]].traject)
+            print("traveltime ", trajecten[options[i]].total_time)
+
+                f.write("\nBest traject:\n")
+                for i in range(num_trajects):
+                    f.write(str(trajecten[options[i]].traject)+ "\n")
+                    f.write(str("traveltime "+ str(trajecten[options[i]].total_time) + "\n"))
+
+                f.write("Total traveltime: " +str(traveltime)+"\n")
+                f.write("K: "+ str(k) +"\n")
+                f.write("CPT: "+ str(end-start))
+
+>>>>>>> add34a17fe047f38348640e0a36c2494f8fb511b
 
 
 

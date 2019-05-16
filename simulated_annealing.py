@@ -67,10 +67,17 @@ class SimulatedAnnealing(object):
             #remove the first connection by removing the starting station from the list
             #del trajecten[x].traject[0]
 
+<<<<<<< HEAD
             # look up the travel time of the first connection
             for connection in connections:
                 if ((strt_station == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
                     min = connection.travelTime
+=======
+        # look up the travel time of the first connection
+        for connection in connections:
+            if ((strt_station == connection.stationA) & (trajecten[x].traject[0] == connection.stationB) ):
+                min = connection.travelTime
+>>>>>>> add34a17fe047f38348640e0a36c2494f8fb511b
 
             # update the travel time of the traject
             trajecten[x].total_time = trajecten[x].total_time - min

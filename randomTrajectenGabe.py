@@ -70,7 +70,11 @@ class Map(object):
             found_k = []
 
             # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
+<<<<<<< HEAD
             for i in range(10):
+=======
+            for i in range(1000000):
+>>>>>>> add34a17fe047f38348640e0a36c2494f8fb511b
 
                 mounted_connections  = []
                 traveltime = 0
@@ -145,7 +149,11 @@ class Map(object):
     # Create a traject with a random begin station
     def random_traject(self):
         trajecten = []
+<<<<<<< HEAD
         for x in range(10):
+=======
+        for x in range(10000):
+>>>>>>> add34a17fe047f38348640e0a36c2494f8fb511b
             index = random.randint(0, len(self.stations) - 1)
             begin_station = self.stations[index].name
             trajecten.append(self.new_traject(str(x), begin_station, "c"))
