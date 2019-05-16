@@ -114,16 +114,16 @@ class Map(object):
             x.append(i)
             found_kBest.append(k)
 
-        print("ok ")
-        print(trajecten[1].traject[0])
-        strt_station = trajecten[1].traject[0]
-        print(trajecten[1].traject)
-        iteraties_SA = 2
-        for i in range(iteraties_SA):
-            temp = (iteraties_SA/(iteraties_SA - i))*100
-            print(trajecten)
-            trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
-            print(trajecten)
+        #print("ok ")
+        #print(trajecten[1].traject[0])
+        #strt_station = trajecten[1].traject[0]
+        #print(trajecten[1].traject)
+        #iteraties_SA = 2
+        #for i in range(iteraties_SA):
+        #    temp = (iteraties_SA/(iteraties_SA - i))*100
+        #    print(trajecten)
+        #    trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
+        #    print(trajecten)
 
         #for i in range(num_trajects):
             #print(trajecten[options[i]].traject)
