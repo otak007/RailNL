@@ -45,7 +45,11 @@ class SimulatedAnnealing(object):
 
 
         K = SimulatedAnnealing.Calculate_K(trajecten, num_trajects)
+<<<<<<< HEAD
         from randomTrajectenSA import Map
+=======
+        from randomTrajecten import Map
+>>>>>>> 3592a91484098c15d2e83692e951391373201f05
 
         Solution_Old = copy.deepcopy(trajecten)
         min = 0
@@ -68,6 +72,7 @@ class SimulatedAnnealing(object):
                 #print(connection.stationA,  connection.stationB)
                 #print(strt_station, trajecten[x].traject[0])
                 if ((connection.stationA == strt_station) & (connection.stationB == trajecten[x].traject[0]) ):
+<<<<<<< HEAD
                     min = connection.travelTime
                 elif ((connection.stationB == strt_station) & (connection.stationA == trajecten[x].traject[0]) ):
                     min = connection.travelTime
@@ -90,6 +95,30 @@ class SimulatedAnnealing(object):
 
         Solution_New = SimulatedAnnealing.travel(self, trajecten, x, connections, stations, num_trajects)
 
+=======
+                    min = connection.travelTime
+                elif ((connection.stationB == strt_station) & (connection.stationA == trajecten[x].traject[0]) ):
+                    min = connection.travelTime
+
+        #print("Min: ", min)
+        # update the travel time of the traject
+
+        trajecten[x].total_time -= min
+
+        #get the index of the last station
+        #laatste = len(trajecten[x].traject)-1
+
+        # get the name of the first station
+        for station in stations:
+            if trajecten[x].traject[0] == station.name:
+                station_eind = station
+                break
+
+        # add a new station to the traject
+
+        Solution_New = SimulatedAnnealing.travel(self, trajecten, x, connections, stations, num_trajects)
+
+>>>>>>> 3592a91484098c15d2e83692e951391373201f05
 
         #trajecten[x].print_all()
 
@@ -117,6 +146,7 @@ class SimulatedAnnealing(object):
 
         K = SimulatedAnnealing.Calculate_K(Solution, num_trajects)
         return Solution
+<<<<<<< HEAD
 
 
 
@@ -127,6 +157,18 @@ class SimulatedAnnealing(object):
         possible_times = []
         possible_critical = []
 
+=======
+
+
+
+    def travel(self, trajecten, x, connections, stations, num_trajects):
+        # Initialize lists
+        possible_connections = []
+        possible_names = []
+        possible_times = []
+        possible_critical = []
+
+>>>>>>> 3592a91484098c15d2e83692e951391373201f05
         traject = trajecten[x]
 
         self.is_critical()

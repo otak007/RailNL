@@ -129,7 +129,11 @@ class Map(object):
 
 
         strt_station = trajecten[1].traject[0]
+<<<<<<< HEAD
         iteraties_SA = 100
+=======
+        iteraties_SA = 10000
+>>>>>>> 3592a91484098c15d2e83692e951391373201f05
 
 
         #for t in range(num_trajects):
