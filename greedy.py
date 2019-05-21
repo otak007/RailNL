@@ -1,6 +1,6 @@
-from connections import Connection
+from connectionsSander import Connection
 from stations import Station
-from traject import Traject
+from trajectSander import Traject
 
 import csv
 import matplotlib.pyplot as plt
@@ -17,17 +17,17 @@ class Map(object):
 
     def load_connections(self):
         # Read excel file and create a list with connection objects
-        with open('data/ConnectiesHolland.csv') as csv_file:
+        with open('data/ConnectiesNationaal.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             connections = []
             for row in csv_reader:
-                connections.append(Connection(row[0], row[1], row[2], False))
+                connections.append(Connection(csv_reader.line_num, row[0], row[1], row[2]))
             return connections
 
     def load_stations(self):
         # Read excel file and create a list with station objects
-        with open('data/StationsHolland.csv') as csv_file:
+        with open('data/StationsNationaal.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             stations = []
@@ -60,20 +60,19 @@ class Map(object):
 
             for connection in self.connections:
 
-                if (station.name == connection.stationA or station.name == connection.stationB) and connection.chooseConnection == False:
-                   connection.chooseConnection = True
+                if station.name == connection.stationA or station.name == connection.stationB:
 
                    for station2 in self.stations:
                        if station2.name == connection.stationB or station2.name == connection.stationA:
                            if station.critical or station2.critical:
                                plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y-')
                            else:
-                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y--')
+                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y-')
 
-    def new_traject(self, name, station, color):
+    def new_traject(self, station, color):
 
         # Create new traject
-        traject = Traject(name, station)
+        traject = Traject(station)
 
         # Transform string to object
         for row in self.stations:
@@ -106,13 +105,15 @@ class Map(object):
                 possible_names.append(connection.stationA)
                 possible_times.append(connection.travelTime)
                 possible_scores.append(connection.calc_val())
-
+        print(possible_names)
+        print(possible_scores)
+        print("\n")
         # Looks for best score and according travel time
         best_score = max(possible_scores)
         best_time = possible_times[possible_scores.index(best_score)]
 
         # If maximum time is not yet exceeded, add fastest connection to traject
-        if traject.total_time + best_time <= 120:
+        if traject.total_time + best_time <= 180:
 
             # Add time to traject total time and score to total score
             traject.total_time += best_time
@@ -160,7 +161,7 @@ class Map(object):
 
 
             # Create new traject and travel
-            traject = self.new_traject(str(x), self.stations[x].name, "c")
+            traject = self.new_traject(self.stations[x].name, "c")
             trajecten.append(traject)
             scores.append(sum(traject.scores))
 
@@ -225,18 +226,20 @@ if __name__ == "__main__":
     # Initialize map, plot and give four starting stations
     NH = Map()
     NH.plot()
-    tot_time = 0
-    for connectie in NH.connections:
-        tot_time += connectie.travelTime
-    print(tot_time)
     NH.all_stations("b")
     NH.all_stations("r")
     NH.all_stations("c")
     NH.all_stations("k")
-    NH.all_stations("m")
-    plt.show()
-    for traject in NH.trajecten:
-        print(traject.traject)
-        print(traject.scores)
-        print("\n")
+    NH.all_stations("g")
+    NH.all_stations("r")
+    NH.all_stations("b")
+    NH.all_stations("r")
+    NH.all_stations("g")
+    NH.all_stations("k")
+    NH.all_stations("c")
+    NH.all_stations("r")
+    NH.all_stations("g")
+    NH.all_stations("k")
+    NH.all_stations("r")
     print(NH.total_score)
+    plt.show()
