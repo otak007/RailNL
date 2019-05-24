@@ -7,3 +7,7 @@ Bij dit algoritme worden er 10000 random trajecten gemaakt. Uit die 10000 trajec
 - Greedy
 
 Bij dit algoritme wordt voor elk station een traject gemaakt met dat station als begin. Bij het bepalen van het volgende station binnen dat traject kijkt hij steeds naar welke connectie de meeste punten oplevert en voegt deze toe aan het traject. Dit doet hij tot de maximale tijd bereikt is. Aan het einde van het traject worden alle overbodige connecties (connecties aan het eind die minpunten opleveren) van het traject afgehaald. Dan vergelijkt hij alle trajecten met elkaar en kiest hij het traject dat de meeste punten oplevert. 
+
+- Depth first
+
+Bij dit algoritme is het de bedoeling dat je een cijfer meegeeft. Dat cijfer staat voor het aantal stations dat het traject maximaal mag hebben. Het algoritme gaat dan voor elk station alle mogelijke trajecten af tot het maximale aantal stations bereikt is of tot de maximale reistijd bereikt is. Dan worden alle trajecten met elkaar vergeleken en wordt de beste uitgekozen.
