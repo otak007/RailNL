@@ -3,6 +3,17 @@ De Conducteurs
 
 Wij hebben een aantal algoritmes gemaakt waarbij we de K zo hoog mogelijk hebben gemaakt. De K waarde hangt af van de totale reistijd, aantal bereden kritieke verbindingen en het aantal trajecten dat is gebruikt.
 
+# Algoritmes
+
+We hebben de volgende algoritmes gebruikt:
+
+- Random
+- Greedy
+- Simulated annealing (met hill climber)
+- Depth first
+
+Deze zijn met uitleg te vinden in het mapje code -> algorithms
+
 ## Aan de slag (Getting Started)
 
 ### Vereisten (Prerequisites)
