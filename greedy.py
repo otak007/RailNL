@@ -1,4 +1,4 @@
-from connectionsSander import Connection
+from connections import Connection
 from stations import Station
 from trajectSander import Traject
 
