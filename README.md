@@ -15,9 +15,9 @@ We hebben de volgende algoritmes gebruikt:
 
 Deze zijn met uitleg te vinden in het mapje code -> algorithms
 
-## Aan de slag (Getting Started)
+## Aan de slag 
 
-### Vereisten (Prerequisites)
+### Vereisten
 
 Deze codebase is volledig geschreven in [Python3.6.3](https://www.python.org/downloads/). In requirements.txt staan alle benodigde packages om de code succesvol te draaien. Deze zijn gemakkelijk te installeren via pip dmv. de volgende instructie:
 
