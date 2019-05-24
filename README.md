@@ -1,7 +1,8 @@
 # RailNL
 De Conducteurs
 
-Wij hebben een aantal algoritmes gemaakt waarbij we de K zo hoog mogelijk hebben gemaakt. De K waarde hangt af van de totale reistijd, aantal bereden kritieke verbindingen en het aantal trajecten dat is gebruikt.
+Het programma maakt een lijnvoering door (een deel) van Nederland, deze lijnvoering bestaat uit een of meerdere trajecten. Het doel is om de Optimalisatie functie K zo hoog mogelijk te maken.
+Wij hebben een aantal algoritmes gemaakt waarbij we die K zo hoog mogelijk proberen te krijgen. De K waarde hangt af van de totale reistijd, aantal bereden kritieke verbindingen en het aantal trajecten dat is gebruikt.
 
 # De algoritmes:
 
