@@ -18,9 +18,11 @@ class Map(object):
 
 
     def load_connections(self):
-        # Read excel file and create a list with connection objects
-        #with open('ConnectiesNationaal.csv') as csv_file:
-        with open('ConnectiesHolland.csv') as csv_file:
+        '''
+        Read excel file and create a list with connection objects
+        with open ('Connecties...csv') as csv_file
+        '''
+        with open('data/ConnectiesHolland.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             connections = []
@@ -29,54 +31,44 @@ class Map(object):
             return connections
 
     def load_stations(self):
-        # Read excel file and create a list with station objects
-        #with open('StationsNationaal.csv') as csv_file:
-        with open('StationsHolland.csv') as csv_file:
+        '''
+        Read excel file and create a list with station objects
+        with open('Stations...csv') as csv_file:
+        '''
+        with open('data/StationsHolland.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
-
             stations = []
-
             for row in csv_reader:
                 if len(row) == 3:
                     stations.append(Station(row[0], row[1], row[2], " "))
                 else:
                     stations.append(Station(row[0], row[1], row[2], row[3]))
-
             return stations
 
-
-
+    '''
+    Checks if connection is connected to critical station
+    '''
     def is_critical(self):
-
-        # Checks if connection is connected to critical station
         for station in self.stations:
             for connection in self.connections:
                 if (station.name == connection.stationA or station.name == connection.stationB) and station.critical == True:
                     connection.critical = 1
 
-
-    # Choose random 4 trajects 1000000 times and return the 4 trajects with highest K
+    '''
+    Choose trajecten creates x number of tjactorys and returns a lining with the
+    highest K value.
+    '''
     def choose_trajecten(self):
-
         max_number_trajects = 20
         tot_num_critical = 20
         trajecten = self.random_traject()
-
-        #for num_trajects in range(1, max_number_trajects+1):
         for num_trajects in range(4 , 5):
             start = time.time()
-
-
-            # Create 4 random different integers
+            # create 4 random different integers
             options = random.sample(range(0, len(trajecten)), num_trajects)
-
             x = []
             found_kBest = []
             found_k = []
-
-            # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
-            #for i in range(1000000):
-
             # Choose 4 trajects twice and remember the 4 with the highest K, repeat this 1 000 000 times
             for i in range(10):
 
@@ -129,11 +121,7 @@ class Map(object):
 
 
         strt_station = trajecten[1].traject[0]
-<<<<<<< HEAD
         iteraties_SA = 100
-=======
-        iteraties_SA = 10000
->>>>>>> 3592a91484098c15d2e83692e951391373201f05
 
 
         #for t in range(num_trajects):
@@ -141,18 +129,18 @@ class Map(object):
         print("VOLGENDE TRAJECT", )
         #trajectSA = trajecten[x].traject
         #if (trajecten[x].traject != None):
-        for i in range(iteraties_SA):
-            temp = ((iteraties_SA - i)/(iteraties_SA))*100
-            #Choose a traject to change
-            x = randint(0, num_trajects - 1)
-            trajecten = SimulatedAnnealing.SA(self, x, trajecten, temp, num_trajects, self.connections, self.stations)
-            K = SimulatedAnnealing.Calculate_K(trajecten, num_trajects)
-            print("K is: ", K)
+
+        #Choose a traject to change
+        #x = randint(0, num_trajects - 1)
+        hillclimber = False
+        trajecten = SimulatedAnnealing.SA(self, trajecten, iteraties_SA,  num_trajects, self.connections, self.stations, hillclimber)
+        K = SimulatedAnnealing.Calculate_K(trajecten, num_trajects)
+        print("K is: ", K)
 
         #Plot of the temperature:
         x = [i for i in range(iteraties_SA)]
         y = [(((iteraties_SA - i)/(iteraties_SA))*100) for i in x]
-        plt.plot(x,y)
+        #plt.plot(x,y)
 
         #temp = 1000
         #trajecten = SimulatedAnnealing.SA(self, trajecten, temp, num_trajects, self.connections, self.stations)
@@ -198,7 +186,9 @@ class Map(object):
         return self.travel(traject, start_station, color)
 
 
-
+    '''
+    Checks if connection is connected to critical station
+    '''
     def travel(self, traject, station, color):
         # Initialize lists
         possible_connections = []

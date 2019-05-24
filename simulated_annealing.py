@@ -2,7 +2,6 @@ from connections import Connection
 from stations import Station
 from traject import Traject
 from random import randint
-#from randomTrajecten import Map
 import numpy as np
 
 import csv
@@ -11,177 +10,121 @@ import random
 import copy
 
 
-
-
 # Simulated Annealing SA
 class SimulatedAnnealing(object):
+    '''
+    SA randomly deletes the first one or up to 4 connections, and after that
+    adds one or up to 4 new connections. Or untill the maximum time of 120
+    min is reached. If this gives a better solution, than that will be accepted.
+    Otherwise the worse solution is only accepted given a probability depending
+    on the iterations (temperature) and if hillclimber is false.
+    The default settings are for Holland. For the whole of the Netherlands
+    the max number of the trajectory is 180 mins and 89 total of critical
+    connections.
 
-    def Calculate_K(trajecten, num_trajects):
+    Arguments:
+        self: is the map from the main program
+        trajectories: the linefeeding to optimize
+        iteraties_SA: the number of iterations
+        num_trajects: the number of trajectories in the linefeeding
+        connections: the connections in the graph
+        stations: the nodes in the graph
+        hillclimber: a boolean for the option to use the hillclimber method
 
+    Return:
+        A linefeeding with the same number of trajectories.
+
+    '''
+    def SA(self,trajectories, iteraties_SA, num_trajects, connections, stations, hillclimber):
+        for i in range(iteraties_SA):
+            temp = ((iteraties_SA - i)/(iteraties_SA))*100
+            from randomTrajecten import Map
+            solution_old = copy.deepcopy(trajectories)
+            min = 0
+            #Choose a traject to change
+            x = randint(0, num_trajects - 1)
+            # create 4 random different integers of how many connections to delete
+            options = random.sample(range(0, 4), 1)
+            for i in range(options[0]):
+                # if there are more than one stations in the traject remove the first
+                if (len(trajectories[x].traject) > 1):
+                    #remove the first connection by removing the starting station from the list
+                    strt_station = trajectories[x].traject[0]
+                    strt_connection = trajectories[x].connections[0]
+                    trajectories[x].traject.remove(strt_station)
+                    trajectories[x].connections.remove(strt_connection)
+                    for connection in connections:
+                        if ((connection.stationA == strt_station) & (connection.stationB == trajectories[x].traject[0]) ):
+                            min = connection.travelTime
+                        elif ((connection.stationB == strt_station) & (connection.stationA == trajectories[x].traject[0]) ):
+                            min = connection.travelTime
+                trajectories[x].total_time -= min
+            # creates a random number of how many connections to add to the trajectory
+            times = random.sample(range(0, 4), 1)
+            times = times[0]
+            # create a new solution
+            solution_new = SimulatedAnnealing.travel(self, trajectories, x, connections, stations, num_trajects, times)
+            # calculate how much worse the new solution is
+            new_K = SimulatedAnnealing.Calculate_K(solution_new, num_trajects)
+            old_K = SimulatedAnnealing.Calculate_K(solution_old, num_trajects)
+            # calculate a probability of accepting a bad solution based on the temperature and the loss
+            loss = np.abs((old_K - new_K)*1)
+            probability = np.exp(-(loss / temp))
+            # take the old solution as the default return solution
+            solution = solution_old
+            # always accept a better solution
+            if (new_K >= old_K):
+                solution = solution_new
+            # if the solution is worse, there is a chance we take it anyway
+            elif (new_K < old_K and (probability > random.random() )) and (hillclimber == False):
+                solution = solution_new
+            K = SimulatedAnnealing.Calculate_K(solution, num_trajects)
+            print("K is: ", K)
+        return solution
+
+    '''
+    Calculate_K calculates the K value of the whole lining for Holland.
+    For the whole of the Netherlands the total number of critical
+    connections is 89 and the max traveltime is 180.
+    '''
+    def Calculate_K(trajectories, num_trajects):
         tot_num_critical = 20
         mounted_connections  = []
         traveltime = 0
         mounted_connections_critical = 0
-
-
-
-        # Create the total traveltime and total number of mounted critical connections for the first 4 trajects
-        for i in range(num_trajects):
-            traveltime = traveltime + trajecten[i].total_time
-            for connection in trajecten[i].connections:
-
-                # Add a connection to the list only when it is the first time the connection is mounted.
-                if mounted_connections.count(connection) == 0:
-                    mounted_connections.append(connection)
-                    mounted_connections_critical = mounted_connections_critical + connection.critical
-
+        count = 0
+        # create the total traveltime and total number of mounted critical connections for the first 4 trajects
+        for k in range(num_trajects):
+            traveltime = traveltime + trajectories[k].total_time
+            for connection in trajectories[k].connections:
+                # only unique coinnections will be added
+                for i in range(len(mounted_connections)):
+                    if (mounted_connections[i].stationA == connection.stationA) and ((mounted_connections[i].stationB == connection.stationB)):
+                        count += 1
+                if (count == 0):
+                        mounted_connections.append(connection) if connection not in mounted_connections else mounted_connections
+                count = 0
+        for connection in mounted_connections:
+            mounted_connections_critical = mounted_connections_critical + connection.critical
         k = mounted_connections_critical/tot_num_critical*10000 - (20*num_trajects + traveltime/10)
-
         return k
 
-
-    def SA(self, x, trajecten, temp, num_trajects, connections, stations):
-
-
-
-        K = SimulatedAnnealing.Calculate_K(trajecten, num_trajects)
-<<<<<<< HEAD
-        from randomTrajectenSA import Map
-=======
-        from randomTrajecten import Map
->>>>>>> 3592a91484098c15d2e83692e951391373201f05
-
-        Solution_Old = copy.deepcopy(trajecten)
-        min = 0
-
-        # Create 4 random different integers
-        options = random.sample(range(0, 4), 1)
-        print(options)
-
-        #if there are more than one stations in the traject remove the first
-        if (len(trajecten[x].traject) > 1):
-
-            #remove the first connection by removing the starting station from the list
-            strt_station = trajecten[x].traject[0]
-            strt_connection = trajecten[x].connections[0]
-            trajecten[x].traject.remove(strt_station)
-            trajecten[x].connections.remove(strt_connection)
-
-            # look up the travel time of the first connection
-            for connection in connections:
-                #print(connection.stationA,  connection.stationB)
-                #print(strt_station, trajecten[x].traject[0])
-                if ((connection.stationA == strt_station) & (connection.stationB == trajecten[x].traject[0]) ):
-<<<<<<< HEAD
-                    min = connection.travelTime
-                elif ((connection.stationB == strt_station) & (connection.stationA == trajecten[x].traject[0]) ):
-                    min = connection.travelTime
-
-        #print("Min: ", min)
-        # update the travel time of the traject
-
-        trajecten[x].total_time -= min
-
-        #get the index of the last station
-        #laatste = len(trajecten[x].traject)-1
-
-        # get the name of the first station
-        for station in stations:
-            if trajecten[x].traject[0] == station.name:
-                station_eind = station
-                break
-
-        # add a new station to the traject
-
-        Solution_New = SimulatedAnnealing.travel(self, trajecten, x, connections, stations, num_trajects)
-
-=======
-                    min = connection.travelTime
-                elif ((connection.stationB == strt_station) & (connection.stationA == trajecten[x].traject[0]) ):
-                    min = connection.travelTime
-
-        #print("Min: ", min)
-        # update the travel time of the traject
-
-        trajecten[x].total_time -= min
-
-        #get the index of the last station
-        #laatste = len(trajecten[x].traject)-1
-
-        # get the name of the first station
-        for station in stations:
-            if trajecten[x].traject[0] == station.name:
-                station_eind = station
-                break
-
-        # add a new station to the traject
-
-        Solution_New = SimulatedAnnealing.travel(self, trajecten, x, connections, stations, num_trajects)
-
->>>>>>> 3592a91484098c15d2e83692e951391373201f05
-
-        #trajecten[x].print_all()
-
-        # calculate how much worse the new solution is
-        New_K = SimulatedAnnealing.Calculate_K(Solution_New, num_trajects)
-        Old_K = SimulatedAnnealing.Calculate_K(Solution_Old, num_trajects)
-
-        loss = np.abs((Old_K - New_K)*1)
-        # calculate a probability of accepting a bad solution based on the temperature
-        # and the loss in K
-        probability = np.exp(-(loss / temp))
-        #print("Kans om een slechtere K aan te nemen: ", probability)
-        # Take the old solution as the default return solution
-        Solution = Solution_Old
-
-        # always accept a better solution, so Solution_New is the default return value
-        # If the new solution is better, take that one
-        if (New_K >= Old_K):
-            Solution = Solution_New
-        # Or if the solution is worse, there is a chance we take it anyway
-        elif (New_K < Old_K and (probability > random.random() )):
-            Solution = Solution_New
-
-
-
-        K = SimulatedAnnealing.Calculate_K(Solution, num_trajects)
-        return Solution
-<<<<<<< HEAD
-
-
-
-    def travel(self, trajecten, x, connections, stations, num_trajects):
-        # Initialize lists
+    '''
+    Travel receives a trajectory and adds a given number (times) of connections
+    or untill the maximum of 120 minutes is reached.
+    '''
+    def travel(self, trajectories, x, connections, stations, num_trajects, times):
         possible_connections = []
         possible_names = []
         possible_times = []
         possible_critical = []
-
-=======
-
-
-
-    def travel(self, trajecten, x, connections, stations, num_trajects):
-        # Initialize lists
-        possible_connections = []
-        possible_names = []
-        possible_times = []
-        possible_critical = []
-
->>>>>>> 3592a91484098c15d2e83692e951391373201f05
-        traject = trajecten[x]
-
-        self.is_critical()
-
+        # maximum time is 120 mins for only Holland, 180 min for the Netherlands
         max_min = 120
-
+        traject = trajectories[x]
+        self.is_critical()
         last = len(traject.traject)
         last_station = traject.traject[last-1]
-        #print("0:TRAJECT:", traject, "STATION: ", station.name)
-        # Maximum time is 120 mins
-        if traject.total_time < max_min:
-
-            # Add relevant connections to relevant lists
+        if traject.total_time < max_min and times > 0:
             for connection in connections:
                 if last_station == connection.stationA and connection.travelTime + traject.total_time < max_min:
                     possible_names.append(connection.stationB)
@@ -193,30 +136,21 @@ class SimulatedAnnealing(object):
                     possible_times.append(connection.travelTime)
                     possible_connections.append(connection)
                     possible_critical.append(connection.critical)
-
-
-            # return the traject when no other connection is possible to add to the traject
             if len(possible_names) == 0:
-                return trajecten;
-            # Not possible choose the same connection 2 times in a row, except the station has only 1 connection
+                return trajectories;
+            # it is not possible choose the same connection 2 times in a row, except the station has only 1 connection
             if len(traject.traject) > 0 and len(possible_names) > 1 and possible_names.count(traject.traject[-1]) > 0:
                 delete_index = possible_names.index(traject.traject[-1])
                 possible_names.pop(delete_index)
                 possible_times.pop(delete_index)
                 possible_connections.pop(delete_index)
-
-            # Choose random the next station
+            # choose random the next station
             random_index = random.randint(0, len(possible_names) - 1)
             next_station = possible_names[random_index]
             traject.total_time += possible_times[random_index]
-
-
-            # Reset current station
             traject.traject.append(next_station)
             traject.connections.append(possible_connections[random_index])
-
-            # Travel again with
-            SimulatedAnnealing.travel(self, trajecten, x, connections, stations, num_trajects)
-
-
-        return trajecten
+            times -= 1
+            # travel again until the line is full or the number of times are 0
+            SimulatedAnnealing.travel(self, trajectories, x, connections, stations, num_trajects, times)
+        return trajectories
