@@ -1,2 +1,5 @@
-Matplotlib version 3.0.1
-Numpy 1.15.3
+matplotlib
+numpy
+random
+copy
+csv
