@@ -20,11 +20,11 @@ Deze codebase is volledig geschreven in [Python3.6.3](https://www.python.org/dow
 pip install -r requirements.txt
 ```
 
-### Structure
+### Structuur
 
 Alle Python scripts staan in de folder Code. In de map Data zitten alle input waardes en in de map resultaten worden alle resultaten opgeslagen door de code.
 
-### Testing
+### Test
 
 Om de code te draaien met de standaardconfiguratie (bv. brute-force en voorbeeld.csv) gebruik de instructie:
 
@@ -32,14 +32,14 @@ Om de code te draaien met de standaardconfiguratie (bv. brute-force en voorbeeld
 python main.py
 ```
 
-## Authors
+## Auteurs
 
 *   Gabe Otagho
 *   Sander Nobel
 *   Pjotr van Hulst
 
 
-## Special Thanks
+## Dankwoord
 
 * StackOverflow
 * Minor Programmeren at the UvA
