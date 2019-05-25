@@ -9,20 +9,19 @@ Created on Mon Apr  8 21:07:01 2019
 
 # Initial connection objects
 class Connection(object):
-    def __init__(self, stationA, stationB, travelTime, chooseConnection = False, id = None):    #index,
+    def __init__(self, stationA, stationB, travelTime, id = None):    #index,
         self.stationA = stationA
         self.stationB = stationB
         self.travelTime = int(float(travelTime))
-        self.chooseConnection = chooseConnection
         self.travelled = False
         self.critical = 0
         self.id = id
 
 
-    def calc_val(self):
+    def calc_val(self, crit_stations):
         ## Calculates value according to given formula
         if self.travelled == False:
-            score = self.critical * (10000 / 20) - self.travelTime / 10
+            score = self.critical * (10000 / crit_stations) - self.travelTime / 10
         else:
             score = 0 - self.travelTime / 10
         return score

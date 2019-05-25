@@ -1,245 +1,178 @@
-from connections import Connection
-from stations import Station
-from trajectSander import Traject
+from code.classes.map import Map
+from code.classes.stations import Station
+from code.classes.traject import Traject
 
 import csv
 import matplotlib.pyplot as plt
 
-class Map(object):
+def all_stations(color, crit_stations, max_time, map, all_critical):
+    ## Goes over all start stations and chooses best traject
 
-    def __init__(self):
-        self.connections = self.load_connections()
-        self.stations = self.load_stations()
-        self.total_score = 0
-        self.trajecten = []
-        self.scores = []
-        self.driven_connections = []
+    # Initialize lists
+    trajecten = []
+    scores = []
 
-    def load_connections(self):
-        # Read excel file and create a list with connection objects
-        with open('data/ConnectiesNationaal.csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
+    # Goes over all start stations
+    for x in range(len(map.stations)):
 
-            connections = []
-            for row in csv_reader:
-                connections.append(Connection(csv_reader.line_num, row[0], row[1], row[2]))
-            return connections
+        # Reset critical stations
+        is_critical(map, all_critical)
 
-    def load_stations(self):
-        # Read excel file and create a list with station objects
-        with open('data/StationsNationaal.csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
 
-            stations = []
+        # Create new traject and travel
+        traject = new_traject(map.stations[x].name, "c", crit_stations, max_time, map)
+        trajecten.append(traject)
+        scores.append(sum(traject.scores))
 
-            for row in csv_reader:
-                stations.append(Station(row[0], row[1], row[2], row[3]))
-                plt.plot(float(row[2]), float(row[1]), "bo")
-                plt.text(float(row[2]) -0.02, float(row[1])+0.02, row[0], fontsize=5)
-            return stations
+    # Choose traject with highest score
+    index = scores.index(max(scores))
+    best_traject = trajecten[index]
 
-    def is_critical(self):
+    # add connections from best traject to list of already driven connections
+    for connection in best_traject.connections:
+        map.driven_connections.append(connection.id)
 
-        crit_stations = []
+    print(map.driven_connections)
+    # add score to total score, subtract 20 as base cost
+    map.total_score += sum(best_traject.scores) - 20
 
-        # Checks if connection is connected to critical station
-        for station in self.stations:
-            for connection in self.connections:
-                if self.driven_connections:
-                    if connection not in self.driven_connections:
-                        connection.critical = 1
-                    else:
-                        connection.critical = 0
-                else:
-                    connection.critical = 1
-                    crit_stations.append(connection)
+    map.scores.append(sum(best_traject.scores))
+    map.trajecten.append(best_traject)
+    # Plot traject
+    plot_traject(best_traject, color, map)
 
-    def plot(self):
+    return best_traject
 
-        for station in self.stations:
+def new_traject(station, color, crit_stations, max_time, map):
 
-            for connection in self.connections:
+    # Create new traject
+    traject = Traject(station)
 
-                if station.name == connection.stationA or station.name == connection.stationB:
+    # Transform string to object
+    for row in map.stations:
+        if station == row.name:
+            start_station = row
+            break
 
-                   for station2 in self.stations:
-                       if station2.name == connection.stationB or station2.name == connection.stationA:
-                           if station.critical or station2.critical:
-                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y-')
-                           else:
-                               plt.plot([float(station.yCoordinate), float(station2.yCoordinate)], [float(station.xCoordinate), float(station2.xCoordinate)], 'y-')
+    # Travel from start station
+    travel(traject, start_station, color, crit_stations, max_time, map)
+    return traject
 
-    def new_traject(self, station, color):
 
-        # Create new traject
-        traject = Traject(station)
+def is_critical(map, all_critical):
 
-        # Transform string to object
-        for row in self.stations:
-            if station == row.name:
-                start_station = row
-                break
+    # Checks if connection is connected to critical station
+    for connection in map.connections:
+        for station in map.stations:
+            if (station.name == connection.stationA or station.name == connection.stationB) and station.critical == True:
+                connection.critical = 1
 
-        # Travel from start station
-        self.travel(traject, start_station, color)
+        if map.driven_connections:
+            for id in map.driven_connections:
+                if id == connection.id:
+                    connection.critical = 0
+        else:
+            if all_critical == "yes":
+                connection.critical = 1
+
+
+
+
+
+def travel(traject, station, color, crit_stations, max_time, map):
+    traject_scores = 0
+
+    # Initialize lists
+    possible_names = []
+    possible_times = []
+    possible_scores = []
+    possible_connections = []
+
+    # Add relevant connections to relevant lists
+    for connection in map.connections:
+        if station.name == connection.stationA:
+            possible_connections.append(connection)
+            possible_names.append(connection.stationB)
+            possible_times.append(connection.travelTime)
+            possible_scores.append(connection.calc_val(crit_stations))
+        elif station.name == connection.stationB:
+            possible_connections.append(connection)
+            possible_names.append(connection.stationA)
+            possible_times.append(connection.travelTime)
+            possible_scores.append(connection.calc_val(crit_stations))
+
+
+    # Looks for best score and according travel time
+    best_score = max(possible_scores)
+    best_time = possible_times[possible_scores.index(best_score)]
+
+    # If maximum time is not yet exceeded, add fastest connection to traject
+    if traject.total_time + best_time <= max_time:
+
+        # Add time to traject total time and score to total score
+        traject.total_time += best_time
+        traject_scores += best_score
+        traject.scores.append(traject_scores)
+
+        # Transform string to station
+        index = possible_scores.index(best_score)
+        chosen_connection = possible_connections[index]
+        next_station = to_station(possible_names[index], map)
+
+        # Set critical (multiplier) to zero)
+        for connection in map.connections:
+            if (connection == chosen_connection):
+                connection.critical = 0
+
+        # Reset current station and add station to traject list
+        traject.connections.append(chosen_connection)
+        if not traject.traject:
+            traject.traject.append(station.name)
+        traject.traject.append(next_station.name)
+
+        # Travel again from new station
+        travel(traject, next_station, color, crit_stations, max_time, map)
+
+    # If travel time exceeds 120 mins
+    else:
+        # Remove all unneccessary connections
+        remove_unnecessary(traject)
         return traject
 
-    def travel(self, traject, station, color):
-        traject_scores = 0
 
-        # Initialize lists
-        possible_names = []
-        possible_times = []
-        possible_scores = []
-        possible_connections = []
+def plot_traject(traject, color, map):
+    ## plots traject once best traject is chosen
 
-        # Add relevant connections to relevant lists
-        for connection in self.connections:
-            if station.name == connection.stationA:
-                possible_connections.append(connection)
-                possible_names.append(connection.stationB)
-                possible_times.append(connection.travelTime)
-                possible_scores.append(connection.calc_val())
-            elif station.name == connection.stationB:
-                possible_connections.append(connection)
-                possible_names.append(connection.stationA)
-                possible_times.append(connection.travelTime)
-                possible_scores.append(connection.calc_val())
-        print(possible_names)
-        print(possible_scores)
-        print("\n")
-        # Looks for best score and according travel time
-        best_score = max(possible_scores)
-        best_time = possible_times[possible_scores.index(best_score)]
+    # goes over every station in traject and plots it
+    for x in range(1, len(traject.traject)):
+        station1 = to_station(traject.traject[x-1], map)
+        station2 = to_station(traject.traject[x], map)
 
-        # If maximum time is not yet exceeded, add fastest connection to traject
-        if traject.total_time + best_time <= 180:
+        plt.plot([float(station1.yCoordinate), float(station2.yCoordinate)], [float(station1.xCoordinate), float(station2.xCoordinate)], color+"-")
 
-            # Add time to traject total time and score to total score
-            traject.total_time += best_time
-            traject_scores += best_score
-            traject.scores.append(traject_scores)
 
-            # Transform string to station
-            index = possible_scores.index(best_score)
-            chosen_connection = possible_connections[index]
-            next_station = self.to_station(possible_names[index])
+def remove_unnecessary(traject):
+    ## Removes all negative scores at the end of the traject
+    counter = 0
+    # Repeats as many times as there are scores
+    for x in range(1,len(traject.scores)):
 
-            # Set critical (multiplier) to zero)
-            for connection in self.connections:
-                if (connection == chosen_connection):
-                    connection.critical = 0
-
-            # Reset current station and add station to traject list
-            traject.connections.append(chosen_connection)
-            if not traject.traject:
-                traject.traject.append(station.name)
-            traject.traject.append(next_station.name)
-
-            # Travel again from new station
-            self.travel(traject, next_station, color)
-
-        # If travel time exceeds 120 mins
+        # If last element in list is negative, it's an unnecessary connection and neds to be removed
+        if traject.scores[-1] < 0:
+            counter += 1
+            traject.scores.pop(-1)
+            traject.traject.pop(-1)
+            traject.connections.pop(-1)
         else:
-            # Remove all unneccessary connections
-            self.remove_unnecessary(traject)
             return traject
 
-
-    def all_stations(self, color):
-        ## Goes over all start stations and chooses best traject
-
-        # Initialize lists
-        trajecten = []
-        scores = []
-
-        # Goes over all start stations
-        for x in range(len(self.stations)):
-
-            # Reset critical stations
-            self.is_critical()
+    return traject
 
 
-            # Create new traject and travel
-            traject = self.new_traject(self.stations[x].name, "c")
-            trajecten.append(traject)
-            scores.append(sum(traject.scores))
+def to_station(name, map):
+    ## Transforms a station(str) to Station(obj)
 
-        # Choose traject with highest score
-        index = scores.index(max(scores))
-        best_traject = trajecten[index]
-
-        # add connections from best traject to list of already driven connections
-        self.driven_connections.extend(best_traject.connections)
-        self.driven_connections = list(dict.fromkeys(self.driven_connections))
-
-        # add score to total score, subtract 20 as base cost
-        self.total_score += sum(best_traject.scores) - 20
-
-        self.scores.append(sum(best_traject.scores))
-        self.trajecten.append(best_traject)
-        # Plot traject
-        self.plot_traject(best_traject, color)
-
-
-    def plot_traject(self, traject, color):
-        ## plots traject once best traject is chosen
-
-        # goes over every station in traject and plots it
-        for x in range(1, len(traject.traject)):
-            station1 = self.to_station(traject.traject[x-1])
-            station2 = self.to_station(traject.traject[x])
-
-            plt.plot([float(station1.yCoordinate), float(station2.yCoordinate)], [float(station1.xCoordinate), float(station2.xCoordinate)], color+"-")
-
-
-    def remove_unnecessary(self, traject):
-        ## Removes all negative scores at the end of the traject
-        counter = 0
-        # Repeats as many times as there are scores
-        for x in range(1,len(traject.scores)):
-
-            # If last element in list is negative, it's an unnecessary connection and neds to be removed
-            if traject.scores[-1] < 0:
-                counter += 1
-                traject.scores.pop(-1)
-            else:
-                return traject
-
-        del traject.traject[-counter:]
-        del traject.connections[-counter:]
-
-        return traject
-
-
-    def to_station(self, name):
-        ## Transforms a station(str) to Station(obj)
-
-        for row in self.stations:
-            if name == row.name:
-                name = row
-                return name
-
-
-
-if __name__ == "__main__":
-    # Initialize map, plot and give four starting stations
-    NH = Map()
-    NH.plot()
-    NH.all_stations("b")
-    NH.all_stations("r")
-    NH.all_stations("c")
-    NH.all_stations("k")
-    NH.all_stations("g")
-    NH.all_stations("r")
-    NH.all_stations("b")
-    NH.all_stations("r")
-    NH.all_stations("g")
-    NH.all_stations("k")
-    NH.all_stations("c")
-    NH.all_stations("r")
-    NH.all_stations("g")
-    NH.all_stations("k")
-    NH.all_stations("r")
-    print(NH.total_score)
-    plt.show()
+    for row in map.stations:
+        if name == row.name:
+            name = row
+            return name
