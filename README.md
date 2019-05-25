@@ -27,15 +27,17 @@ pip install -r requirements.txt
 
 ### Structuur
 
-Alle Python scripts staan in de folder Code. In de map Data zitten alle input waardes en in de map resultaten worden alle resultaten opgeslagen door de code.
+Alle Python scripts staan in de folder Code. In de map Data zitten alle input waardes.
 
 ### Test
 
-Om de code te draaien met de standaardconfiguratie (bv. brute-force en voorbeeld.csv) gebruik de instructie:
+Om de code te draaien gebruik de instructie:
 
 ```
 python main.py
 ```
+
+Aan de hand van vragen (zoals welke map je wil gebruiken en welk algoritme je wil gebruiken) word je door het probleem gesleept.
 
 ## Auteurs
 
